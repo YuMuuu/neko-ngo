@@ -21,20 +21,4 @@ object Mongo {
   }
 }
 
-import cats.effect.IO
-import fs2.interop.reactivestreams._
 
-class mongon[F[_]: ConcurrentEffect] {
-  val mongoClient: MongoClient = MongoClients.create
-
-  val database: MongoDatabase = mongoClient.getDatabase("mydb")
-
-  val collection: MongoCollection[Document] = database.getCollection("test")
-
-  val doc: Document = new Document("name", "MongoDB")
-    .append("type", "database")
-    .append("count", 1)
-    .append("info", new Document("x", 203).append("y", 102));
-
-  val stream = collection.insertOne(doc).toStream
-}
