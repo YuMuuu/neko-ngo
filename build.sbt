@@ -11,7 +11,9 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(cats,
                                 catsEffect,
                                 catsFree,
-                                mongoDBJavaDriver,
+                                fs2,
+                                fs2ReactiveStreams,
+                                mongoDBJavaStreamDriver,
                                 scalaTest % Test)
   )
 
