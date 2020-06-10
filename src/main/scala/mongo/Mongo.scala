@@ -1,9 +1,10 @@
-package example
+package mongo
 
-import cats.effect.{Async, ConcurrentEffect, Resource, Sync}
+import cats.effect.{Resource, Sync}
 import com.mongodb.MongoClientSettings
-import com.mongodb.reactivestreams.client.{MongoClient, MongoClients, MongoCollection, MongoDatabase}
+import com.mongodb.reactivestreams.client.{MongoClient, MongoClients, MongoCollection}
 import org.bson.Document
+import org.bson.codecs.configuration.CodecRegistry
 
 // 参考にした: https://github.com/fiadliel/fs2-mongodb
 object Mongo {
@@ -20,5 +21,3 @@ object Mongo {
       F.delay(client.close()))
   }
 }
-
-

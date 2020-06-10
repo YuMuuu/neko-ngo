@@ -1,7 +1,8 @@
 package example
 
 import cats.effect.{ConcurrentEffect, ExitCode, IO, IOApp}
-import example.Mongo._
+import mongo.Mongo._
+import mongo.MongoCollectionEffect
 import org.bson.Document
 
 class Example extends IOApp {
@@ -15,14 +16,21 @@ class Example extends IOApp {
       val doc = new Document("name", "MongoDB")
         .append("type", "database")
         .append("count", 1)
-        .append("info", new Document("x", 203).append("y", 102));
+        .append("info", new Document("x", 203).append("y", 102))
+
+      val doc2 = _Document("name", "MongoDB", 1, Point(203, 102))
+      // これを↑のような DocumentTypeにしたい
+
+      case class _Document(name: String, `type`: String, count: Int, info: Point)
+      case class Point(x: Int, y: Int)
+
 
       new MongoCollectionEffect(collection)
         .insertOne(doc)
-        //なんか処理する
         .compile
         .drain
         .as(ExitCode.Success)
     }
   }
 }
+
