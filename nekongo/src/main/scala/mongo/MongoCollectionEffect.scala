@@ -17,7 +17,8 @@ import scala.collection.JavaConverters._
 
 class MongoCollectionEffect[F[_]: ConcurrentEffect, A](
     val underlying: MongoCollection[A])
-    extends AnyVal {
+//    extends AnyVal
+{
   //todo: com.mongodb.reactivestreams.client.MongoCollectionに実装されている関数をすべてラップする
 
 // def getNamespace: MongoNamespace = ???
@@ -34,27 +35,28 @@ class MongoCollectionEffect[F[_]: ConcurrentEffect, A](
 
   @Deprecated
   def count(): Stream[F, Long] =
-    underlying.count().toStream.map(_.asInstanceOf[Long]) //convertの仕方あってる？
+    underlying.count().toStream.map(Long2long) //convertの仕方あってる？
 
   @Deprecated
   def count(filter: Bson): Stream[F, Long] =
     underlying
       .count(filter)
       .toStream
-      .map(_.asInstanceOf[Long]) //convertの仕方あってる？
+      .map(Long2long) //convertの仕方あってる？
 
   @Deprecated
   def count(filter: Bson, options: CountOptions): Stream[F, Long] =
-    underlying.count(filter , options)
-    .toStream()
-    .map(_.asInstanceOf[Long])
+    underlying
+      .count(filter, options)
+      .toStream()
+      .map(Long2long)
 
   @Deprecated
   def count(clientSession: ClientSession): Stream[F, Unit] =
     underlying
       .count(clientSession)
       .toStream()
-      .map(_.asInstanceOf[Long])
+      .map(Long2long)
 
 // def count(clientSession: ClientSession, filter: Bson): Publisher[lang.Long] = ???
   @Deprecated
@@ -62,7 +64,7 @@ class MongoCollectionEffect[F[_]: ConcurrentEffect, A](
     underlying
       .count(clientSession, filter)
       .toStream()
-      .map(_.asInstanceOf[Long])
+      .map(Long2long)
 
 // def count(clientSession: ClientSession, filter: Bson, options: CountOptions): Publisher[lang.Long] = ???
 
@@ -70,7 +72,7 @@ class MongoCollectionEffect[F[_]: ConcurrentEffect, A](
     underlying
       .estimatedDocumentCount()
       .toStream()
-      .map(_.asInstanceOf[Long])
+      .map(Long2long)
 
 // def estimatedDocumentCount(options: EstimatedDocumentCountOptions): Publisher[lang.Long] = ???
 
@@ -78,14 +80,14 @@ class MongoCollectionEffect[F[_]: ConcurrentEffect, A](
     underlying
       .countDocuments()
       .toStream()
-      .map(_.asInstanceOf[Long])
+      .map(Long2long)
 
 // def countDocuments(filter: Bson): Publisher[lang.Long] = ???
   def countDocuments(filter: Bson): Stream[F, Long] =
     underlying
       .countDocuments(filter)
       .toStream()
-      .map(_.asInstanceOf[Long])
+      .map(Long2long)
 
 // def countDocuments(filter: Bson, options: CountOptions): Publisher[lang.Long] = ???
 
@@ -93,14 +95,14 @@ class MongoCollectionEffect[F[_]: ConcurrentEffect, A](
     underlying
       .countDocuments(clientSession)
       .toStream()
-      .map(_.asInstanceOf[Long])
+      .map(Long2long)
 
   def countDocuments(clientSession: ClientSession,
                      filter: Bson): Stream[F, Long] =
     underlying
       .countDocuments(clientSession, filter)
       .toStream()
-      .map(_.asInstanceOf[Long])
+      .map(Long2long)
 // def countDocuments(clientSession: ClientSession, filter: Bson, options: CountOptions): Publisher[lang.Long] = ???
 
 // def distinct[TResult](fieldName: String, resultClass: Class[TResult]): DistinctPublisher[TResult] = ???
@@ -137,7 +139,7 @@ class MongoCollectionEffect[F[_]: ConcurrentEffect, A](
 // def mapReduce[TResult](clientSession: ClientSession, mapFunction: String, reduceFunction: String, clazz: Class[TResult]): MapReducePublisher[TResult] = ???
 
   def bulkWrite(requests: List[WriteModel[A]]): Stream[F, BulkWriteResult] =
-    underlying.bulkWrite(requests.asJava).toStream
+    underlying.bulkWrite(requests.asJava).toStream()
 
 // def bulkWrite(requests: util.List[_ <: WriteModel[_ <: Document]], options: BulkWriteOptions): Publisher[BulkWriteResult] = ???
 // def bulkWrite(clientSession: ClientSession, requests: util.List[_ <: WriteModel[_ <: Document]]): Publisher[BulkWriteResult] = ???
@@ -153,8 +155,7 @@ class MongoCollectionEffect[F[_]: ConcurrentEffect, A](
 // def insertOne(document: Document, options: InsertOneOptions): Publisher[Success] = ???
 
 // def insertOne(clientSession: ClientSession, document: Document): Publisher[Success] = ???
-  def insertOne(clientSession: ClientSession,
-                document: A): Stream[F, Unit] =
+  def insertOne(clientSession: ClientSession, document: A): Stream[F, Unit] =
     underlying.insertOne(clientSession, document).toStream().map(_ => ())
 
 // def insertOne(clientSession: ClientSession, document: Document, options: InsertOneOptions): Publisher[Success] = ???
@@ -210,7 +211,7 @@ class MongoCollectionEffect[F[_]: ConcurrentEffect, A](
 // def replaceOne(clientSession: ClientSession, filter: Bson, replacement: Document, options: UpdateOptions): Publisher[UpdateResult] = ???
 
   def updateOne(filter: Bson, update: Bson): Stream[F, UpdateResult] =
-    underlying.updateOne(filter, update).toStream
+    underlying.updateOne(filter, update).toStream()
 
 // def updateOne(filter: Bson, update: Bson, options: UpdateOptions): Publisher[UpdateResult] = ???
 
@@ -233,7 +234,7 @@ class MongoCollectionEffect[F[_]: ConcurrentEffect, A](
 // def updateOne(clientSession: ClientSession, filter: Bson, update: util.List[_ <: Bson], options: UpdateOptions): Publisher[UpdateResult] = ???
 
   def updateMany(filter: Bson, update: Bson): Stream[F, UpdateResult] =
-    underlying.updateMany(filter, update).toStream
+    underlying.updateMany(filter, update).toStream()
 
 // def updateMany(filter: Bson, update: Bson, options: UpdateOptions): Publisher[UpdateResult] = ???
 
@@ -257,13 +258,19 @@ class MongoCollectionEffect[F[_]: ConcurrentEffect, A](
 // def updateMany(clientSession: ClientSession, filter: Bson, update: util.List[_ <: Bson], options: UpdateOptions): Publisher[UpdateResult] = ???
 
   def findOneAndDelete(filter: Bson): Stream[F, Document] =
-    underlying.find(filter).toStream()
+    underlying
+      .find(filter)
+      .toStream()
+      .map(_.asInstanceOf[Document]) //fix:asInstanceOfをせずに型を推論できるようにする
 
 // def findOneAndDelete(filter: Bson, options: FindOneAndDeleteOptions): Publisher[Document] = ???
 
   def findOneAndDelete(clientSession: ClientSession,
                        filter: Bson): Stream[F, Document] =
-    underlying.findOneAndDelete(clientSession, filter).toStream()
+    underlying
+      .findOneAndDelete(clientSession, filter)
+      .toStream()
+      .map(_.asInstanceOf[Document]) //fix:asInstanceOfをせずに型を推論できるようにする
 
 // def findOneAndDelete(clientSession: ClientSession, filter: Bson, options: FindOneAndDeleteOptions): Publisher[Document] = ???
 
