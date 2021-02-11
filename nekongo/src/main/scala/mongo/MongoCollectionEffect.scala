@@ -5,6 +5,7 @@ import java.util
 import cats.effect.ConcurrentEffect
 import com.mongodb.MongoNamespace
 import com.mongodb.bulk.BulkWriteResult
+import com.mongodb.client.model.changestream.ChangeStreamDocument
 import com.mongodb.client.model.{CountOptions, IndexModel, WriteModel}
 import com.mongodb.client.result.{DeleteResult, UpdateResult}
 import com.mongodb.reactivestreams.client.{ClientSession, MongoCollection}
@@ -110,7 +111,8 @@ class MongoCollectionEffect[F[_]: ConcurrentEffect, A](
 // def distinct[TResult](clientSession: ClientSession, fieldName: String, resultClass: Class[TResult]): DistinctPublisher[TResult] = ???
 // def distinct[TResult](clientSession: ClientSession, fieldName: String, filter: Bson, resultClass: Class[TResult]): DistinctPublisher[TResult] = ???
 
-// def find(): FindPublisher[Document] = ???
+ def find(): Stream[F, Document] = underlying.find().toStream().map(_.asInstanceOf[Document])
+
 // def find[TResult](clazz: Class[TResult]): FindPublisher[TResult] = ???
 // def find(filter: Bson): FindPublisher[Document] = ???
 // def find[TResult](filter: Bson, clazz: Class[TResult]): FindPublisher[TResult] = ???
@@ -124,7 +126,8 @@ class MongoCollectionEffect[F[_]: ConcurrentEffect, A](
 // def aggregate(clientSession: ClientSession, pipeline: util.List[_ <: Bson]): AggregatePublisher[Document] = ???
 // def aggregate[TResult](clientSession: ClientSession, pipeline: util.List[_ <: Bson], clazz: Class[TResult]): AggregatePublisher[TResult] = ???
 
-// def watch(): ChangeStreamPublisher[Document] = ???
+ def watch(): Stream[F, ChangeStreamDocument[Document]] = underlying.watch().toStream() //noge: 戻り型がこれで良いか考える
+
 // def watch[TResult](resultClass: Class[TResult]): ChangeStreamPublisher[TResult] = ???
 // def watch(pipeline: util.List[_ <: Bson]): ChangeStreamPublisher[Document] = ???
 // def watch[TResult](pipeline: util.List[_ <: Bson], resultClass: Class[TResult]): ChangeStreamPublisher[TResult] = ???

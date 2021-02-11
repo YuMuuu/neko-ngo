@@ -1,7 +1,7 @@
 import sbt._
 
 object Dependencies {
-  lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.0.5"
+  lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.2"
 
   lazy val mongoDBJavaStreamDriver = "org.mongodb" % "mongodb-driver-reactivestreams" % "1.13.1"
 

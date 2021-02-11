@@ -18,7 +18,7 @@ lazy val root = (project in file("nekongo"))
 
 lazy val integrationTest = (project in file("integration-test"))
   .settings(
-    name := "neko-ngo",
+    name := "integration-test",
     libraryDependencies ++= Seq(scalaTest % Test)
   )
   .dependsOn(root)
